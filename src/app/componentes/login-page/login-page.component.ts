@@ -113,6 +113,12 @@ export class LoginPageComponent implements OnInit {
     this.idManual = '';
   }
 
+  cancelarEscaneo(): void {
+    this.estadoEscaneo = 'inicial';
+    this.empleadoExiste = undefined;
+  }
+
+
   selectAllText(event: FocusEvent): void {
     const input = event.target as HTMLInputElement;
     input.select();

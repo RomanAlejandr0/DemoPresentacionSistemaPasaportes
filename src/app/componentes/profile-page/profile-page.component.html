@@ -24,9 +24,25 @@
   </header>
 
   <!-- Estado de carga -->
-  <div *ngIf="cargando" class="flex flex-col items-center justify-center py-12">
-    <div class="w-12 h-12 border-4 border-[#123261] border-t-transparent rounded-full animate-spin mb-4"></div>
-    <p class="text-gray-600">Cargando información del empleado...</p>
+  <div *ngIf="cargando" class="flex flex-col items-center justify-center py-12 ">
+    <!-- <div class="w-12 h-12 border-4 border-[#123261] border-t-transparent rounded-full animate-spin mb-4"></div> -->
+    <!-- <p class="text-gray-600">Cargando información del empleado...</p> -->
+
+    <div *ngIf="cargando" class="flex flex-col items-center justify-center min-h-screen">
+      <div class="passport-container">
+        <img src="assets/passport.jpg" class="passport-image" alt="Pasaporte Martinrea">
+        <div class="scan-line"></div>
+      </div>
+
+      <p class="mt-6 text-xl font-medium text-[#123261]">Verificando identidad</p>
+
+      <!-- Barra de progreso -->
+      <div class="w-64 h-2 bg-gray-200 rounded-full mt-4 overflow-hidden">
+        <div class="loading-progress h-full bg-[#123261] rounded-full"></div>
+      </div>
+
+      <p class="mt-3 text-gray-600">Accediendo al perfil del empleado...</p>
+    </div>
   </div>
 
   <!-- Contenido principal -->
@@ -82,7 +98,7 @@
       <!-- Tab: Trazabilidad -->
       <div *ngSwitchCase="'trazabilidad'" class="space-y-6">
         <!-- Próxima evaluación -->
-        <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="bg-white rounded-xl shadow-md p-6 animate-fade-in animate-delay-1">
           <h3 class="text-lg font-bold text-gray-800 mb-4">Próxima evaluación</h3>
           <div class="flex items-center">
             <div class="bg-blue-100 rounded-full p-4 mr-4">
@@ -99,7 +115,7 @@
         </div>
 
         <!-- Asistencia -->
-        <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="bg-white rounded-xl shadow-md p-6 animate-fade-in animate-delay-2">
           <h3 class="text-lg font-bold text-gray-800 mb-4">Asistencia y puntualidad</h3>
           <div class="flex items-center">
             <div class="bg-green-100 rounded-full p-4 mr-4">
@@ -115,7 +131,7 @@
         </div>
 
         <!-- Progreso de categorías -->
-        <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="bg-white rounded-xl shadow-md p-6 animate-fade-in animate-delay-3">
           <h3 class="text-lg font-bold text-gray-800 mb-4">Progreso de categorías</h3>
 
           <!-- Barra de progreso -->
