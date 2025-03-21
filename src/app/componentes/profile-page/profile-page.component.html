@@ -1,0 +1,351 @@
+<!-- profile-page.component.html -->
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <header class="bg-[#123261] text-white shadow-md">
+    <div class="container mx-auto px-4 py-3">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center">
+          <h1 class="text-xl font-bold">Martinrea ID</h1>
+        </div>
+        <div class="flex items-center space-x-3">
+          <button class="p-1.5 rounded-full hover:bg-white hover:bg-opacity-10 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+          </button>
+          <button (click)="cerrarSesion()" class="p-1.5 rounded-full hover:bg-white hover:bg-opacity-10 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Estado de carga -->
+  <div *ngIf="cargando" class="flex flex-col items-center justify-center py-12">
+    <div class="w-12 h-12 border-4 border-[#123261] border-t-transparent rounded-full animate-spin mb-4"></div>
+    <p class="text-gray-600">Cargando información del empleado...</p>
+  </div>
+
+  <!-- Contenido principal -->
+  <main *ngIf="!cargando && empleado" class="container mx-auto px-4 py-6">
+    <!-- Tarjeta de perfil -->
+    <section class="bg-white rounded-xl shadow-md mb-6 overflow-hidden">
+      <div class="p-4 md:p-6">
+        <div class="flex flex-col md:flex-row items-start md:items-center">
+          <div class="h-20 w-20 bg-gray-100 rounded-full flex items-center justify-center mb-4 md:mb-0 md:mr-6">
+            <span *ngIf="!empleado.foto" class="text-[#123261] text-3xl font-bold">{{ obtenerIniciales() }}</span>
+            <img *ngIf="empleado.foto" [src]="empleado.foto" alt="Foto de perfil" class="h-full w-full rounded-full object-cover">
+          </div>
+
+          <div class="flex-grow">
+            <h2 class="text-2xl font-bold text-gray-800">{{ empleado.nombre }}</h2>
+            <p class="text-gray-600">{{ empleado.area }} | Grupo {{ empleado.grupo }} | {{ empleado.turno }}</p>
+
+            <div class="flex flex-wrap gap-2 mt-2">
+              <span class="bg-[#123261] text-white text-sm font-medium px-2.5 py-0.5 rounded-full">
+                Categoría {{ empleado.categoria }}
+              </span>
+              <span class="bg-gray-200 text-gray-800 text-sm font-medium px-2.5 py-0.5 rounded-full">
+                {{ empleado.anosEnEmpresa }} años en la empresa
+              </span>
+            </div>
+          </div>
+
+          <div class="mt-4 md:mt-0 bg-gray-100 px-6 py-4 rounded-lg">
+            <div class="text-xs text-gray-500 mb-1">NÚMERO DE EMPLEADO</div>
+            <div class="text-xl font-bold text-gray-800">{{ empleado.nomina }}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navegación de pestañas -->
+    <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+      <div class="flex flex-wrap">
+        <button
+          *ngFor="let tab of tabs"
+          (click)="cambiarTab(tab.id)"
+          [class.bg-[#123261]]="tabActiva === tab.id"
+          [class.text-white]="tabActiva === tab.id"
+          [class.text-gray-600]="tabActiva !== tab.id"
+          class="py-3 px-4 flex-grow text-center font-medium focus:outline-none transition">
+          {{ tab.nombre }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenido de pestañas -->
+    <div [ngSwitch]="tabActiva">
+      <!-- Tab: Trazabilidad -->
+      <div *ngSwitchCase="'trazabilidad'" class="space-y-6">
+        <!-- Próxima evaluación -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Próxima evaluación</h3>
+          <div class="flex items-center">
+            <div class="bg-blue-100 rounded-full p-4 mr-4">
+              <div class="text-[#123261] text-center">
+                <div class="text-xs font-medium">{{ empleado.proximaEvaluacion.mes }}</div>
+                <div class="text-xl font-bold">{{ empleado.proximaEvaluacion.dia }}</div>
+              </div>
+            </div>
+            <div>
+              <p class="font-medium text-gray-800">Evaluación para categoría {{ empleado.proximaEvaluacion.categoriaObjetivo }}</p>
+              <p class="text-sm text-gray-600">{{ empleado.proximaEvaluacion.hora }} - {{ empleado.proximaEvaluacion.lugar }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Asistencia -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Asistencia y puntualidad</h3>
+          <div class="flex items-center">
+            <div class="bg-green-100 rounded-full p-4 mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div>
+              <p class="font-medium text-gray-800">{{ empleado.asistencia.cumpleRequisitos ? 'Cumple requisitos para evaluación' : 'No cumple requisitos para evaluación' }}</p>
+              <p class="text-sm text-gray-600">{{ empleado.asistencia.faltas }} faltas en los últimos 6 meses</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progreso de categorías -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Progreso de categorías</h3>
+
+          <!-- Barra de progreso -->
+          <div class="relative w-full h-12 bg-gray-200 rounded-full mb-6">
+            <div
+              class="absolute h-full bg-[#123261] rounded-full"
+              [style.width.%]="obtenerPorcentajeProgreso()">
+            </div>
+
+            <!-- Marcadores de categoría -->
+            <div class="absolute top-0 left-0 w-full h-full flex justify-between items-center px-3">
+              <div *ngFor="let cat of categorias; let i = index"
+                  [class.text-white]="i <= obtenerIndiceCategoriaActual()"
+                  [class.text-gray-700]="i > obtenerIndiceCategoriaActual()"
+                  class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm z-10">
+                {{ cat }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Historial -->
+          <div class="text-sm text-gray-600 mt-4">
+            <p>Último cambio: {{ empleado.ultimoCambioCat.fecha }}</p>
+            <p>Promedio anterior: {{ empleado.ultimoCambioCat.promedio }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Matriz de Versatilidad -->
+      <div *ngSwitchCase="'matriz'" class="space-y-6">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-2">Matriz de versatilidad</h3>
+          <p class="text-sm text-gray-600 mb-6">Evaluación de competencias y habilidades para su posición actual</p>
+
+          <!-- Habilidades -->
+          <div class="space-y-6 mb-8">
+            <div *ngFor="let habilidad of empleado.habilidades">
+              <div class="flex justify-between mb-1">
+                <span class="text-sm font-medium text-gray-700">{{ habilidad.nombre }}</span>
+                <span class="text-sm font-medium text-gray-700">{{ habilidad.nivel }}%</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div class="bg-[#123261] h-2.5 rounded-full" [style.width.%]="habilidad.nivel"></div>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">{{ habilidad.descripcion }}</p>
+            </div>
+          </div>
+
+          <!-- Gráfico radar (simulado) -->
+          <div class="p-4 bg-gray-50 rounded-lg">
+            <div class="h-60 flex items-center justify-center">
+              <svg viewBox="0 0 200 200" width="200" height="200">
+                <!-- Pentágono de fondo -->
+                <polygon points="100,10 190,70 170,180 30,180 10,70" fill="none" stroke="#e5e7eb" stroke-width="1" />
+                <polygon points="100,40 160,80 145,150 55,150 40,80" fill="none" stroke="#e5e7eb" stroke-width="1" />
+                <polygon points="100,70 130,90 125,130 75,130 70,90" fill="none" stroke="#e5e7eb" stroke-width="1" />
+
+                <!-- Datos del empleado -->
+                <polygon points="100,15 180,70 160,170 40,170 20,70" fill="#3b82f6" fill-opacity="0.2" stroke="#123261" stroke-width="2" />
+
+                <!-- Etiquetas -->
+                <text x="100" y="5" text-anchor="middle" font-size="8">Fundición</text>
+                <text x="195" y="70" text-anchor="start" font-size="8">Calidad</text>
+                <text x="170" y="190" text-anchor="middle" font-size="8">Seguridad</text>
+                <text x="30" y="190" text-anchor="middle" font-size="8">Mantenimiento</text>
+                <text x="5" y="70" text-anchor="end" font-size="8">Operación</text>
+              </svg>
+            </div>
+            <p class="text-center text-xs text-gray-500 mt-2">Gráfico comparativo de habilidades</p>
+          </div>
+        </div>
+
+        <!-- Objetivos de desarrollo -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Objetivos de desarrollo</h3>
+          <ul class="space-y-4">
+            <li *ngFor="let objetivo of empleado.objetivosDesarrollo" class="flex items-start">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#123261] mr-2 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p class="text-gray-800 font-medium">{{ objetivo.titulo }}</p>
+                <p class="text-xs text-gray-500">{{ objetivo.descripcion }}</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Tab: Permisos -->
+      <div *ngSwitchCase="'permisos'" class="space-y-6">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-2">Permisos de maquinaria</h3>
+          <p class="text-sm text-gray-600 mb-6">Maquinaria autorizada para operar</p>
+
+          <!-- Tarjetas de máquinas -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div *ngFor="let maquina of empleado.maquinas"
+                class="border rounded-lg overflow-hidden"
+                [class.border-green-500]="maquina.estado === 'Autorizado'"
+                [class.border-yellow-500]="maquina.estado === 'En proceso'"
+                [class.border-red-500]="maquina.estado === 'No autorizado'">
+              <div class="h-2"
+                  [class.bg-green-500]="maquina.estado === 'Autorizado'"
+                  [class.bg-yellow-500]="maquina.estado === 'En proceso'"
+                  [class.bg-red-500]="maquina.estado === 'No autorizado'"></div>
+              <div class="p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h4 class="font-medium text-gray-800">{{ maquina.nombre }}</h4>
+                  <svg *ngIf="maquina.estado === 'Autorizado'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-xs text-gray-500">{{ maquina.zona }}</span>
+                  <span class="text-xs font-medium"
+                        [class.text-green-500]="maquina.estado === 'Autorizado'"
+                        [class.text-yellow-500]="maquina.estado === 'En proceso'"
+                        [class.text-red-500]="maquina.estado === 'No autorizado'">
+                    {{ maquina.estado }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Capacitaciones requeridas -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Capacitaciones requeridas</h3>
+          <div class="divide-y">
+            <div *ngFor="let capacitacion of empleado.capacitaciones" class="py-4 first:pt-0 last:pb-0">
+              <div class="flex justify-between">
+                <h4 class="font-medium text-gray-800">{{ capacitacion.nombre }}</h4>
+                <span class="text-xs font-medium px-2 py-1 rounded-full"
+                      [class.bg-green-100]="capacitacion.estado === 'Completado'"
+                      [class.text-green-800]="capacitacion.estado === 'Completado'"
+                      [class.bg-yellow-100]="capacitacion.estado === 'En progreso'"
+                      [class.text-yellow-800]="capacitacion.estado === 'En progreso'"
+                      [class.bg-red-100]="capacitacion.estado === 'Pendiente'"
+                      [class.text-red-800]="capacitacion.estado === 'Pendiente'">
+                  {{ capacitacion.estado }}
+                </span>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">{{ capacitacion.descripcion }}</p>
+              <div *ngIf="capacitacion.estado === 'En progreso'" class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+                <div class="bg-[#123261] h-1.5 rounded-full" [style.width.%]="capacitacion.progreso"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Academia -->
+      <div *ngSwitchCase="'academia'" class="space-y-6">
+        <!-- Cursos en progreso -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Cursos en progreso</h3>
+
+          <div *ngFor="let curso of empleado.cursosEnProgreso" class="mb-4 border-b pb-4 last:border-b-0 last:pb-0">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="font-medium text-gray-800">{{ curso.nombre }}</h4>
+              <span class="text-sm text-[#123261]">{{ curso.progreso }}%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+              <div class="bg-[#123261] h-2 rounded-full" [style.width.%]="curso.progreso"></div>
+            </div>
+            <div class="flex justify-between items-center text-xs text-gray-500">
+              <span>Instructor: {{ curso.instructor }}</span>
+              <span>Fecha límite: {{ curso.fechaLimite }}</span>
+            </div>
+            <button class="mt-2 bg-[#f2571a] hover:bg-opacity-90 text-white text-sm py-1.5 px-3 rounded-md">
+              Continuar curso
+            </button>
+          </div>
+
+          <div *ngIf="empleado.cursosEnProgreso.length === 0" class="text-center py-4 text-gray-500">
+            No tienes cursos en progreso actualmente
+          </div>
+        </div>
+
+        <!-- Certificaciones -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Certificaciones obtenidas</h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div *ngFor="let certificacion of empleado.certificaciones" class="border rounded-lg p-4">
+              <div class="flex items-center mb-2">
+                <div class="bg-blue-100 p-2 rounded-full mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#123261]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="font-medium text-gray-800">{{ certificacion.nombre }}</h4>
+                  <p class="text-xs text-gray-500">Obtenido: {{ certificacion.fecha }}</p>
+                </div>
+              </div>
+              <div class="text-xs text-gray-600">{{ certificacion.descripcion }}</div>
+            </div>
+          </div>
+
+          <div *ngIf="empleado.certificaciones.length === 0" class="text-center py-4 text-gray-500">
+            Aún no has obtenido certificaciones
+          </div>
+        </div>
+
+        <!-- Cursos recomendados -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Cursos recomendados</h3>
+
+          <div class="divide-y">
+            <div *ngFor="let curso of empleado.cursosRecomendados" class="py-3 first:pt-0 last:pb-0">
+              <div class="flex justify-between items-center">
+                <h4 class="font-medium text-gray-800">{{ curso.nombre }}</h4>
+                <button class="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs py-1 px-3 rounded">
+                  Inscribirse
+                </button>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">{{ curso.descripcion }}</p>
+              <div class="flex items-center mt-2 text-xs text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Duración: {{ curso.duracion }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

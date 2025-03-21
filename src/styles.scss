@@ -1,1 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
+
+@import "tailwindcss";
+
+
+body {
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: var(--color-text-primary);
+  background-color: var(--color-gray-light);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

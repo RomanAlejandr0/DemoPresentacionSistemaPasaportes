@@ -1,0 +1,116 @@
+<!-- login-page.component.html -->
+<div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
+  <div class="w-full max-w-3xl bg-white rounded-xl shadow-lg overflow-hidden">
+    <!-- Header -->
+    <div class="bg-[#123261] text-white py-4 px-6">
+      <h1 class="text-2xl font-bold">Martinrea ID</h1>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="p-8 text-center">
+      <!-- Logo -->
+      <div class="mb-6 flex justify-center">
+        <div class="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center">
+          <span class="text-[#123261] text-5xl font-bold">M</span>
+        </div>
+      </div>
+
+      <!-- Título y subtítulo -->
+      <h2 class="text-3xl font-bold text-gray-800 mb-2">Sistema de Identificación de Empleados</h2>
+      <p class="text-gray-600 mb-8">Escanee su tarjeta o identifíquese con su número de nómina</p>
+
+      <!-- Estado de escaneo (condicionalmente visible) -->
+      <div *ngIf="estadoEscaneo === 'escaneando'" class="mb-6 p-4 bg-blue-50 rounded-lg">
+        <div class="flex items-center justify-center">
+          <div class="animate-pulse w-4 h-4 bg-[#123261] rounded-full mr-2"></div>
+          <span class="text-[#123261] font-medium">Esperando escaneo...</span>
+        </div>
+        <p class="text-sm text-gray-600 mt-2">Acerque su tarjeta al escáner</p>
+      </div>
+
+      <!-- Mensajes de validación -->
+      <div *ngIf="estadoEscaneo === 'validando'" class="mb-6 p-4 bg-blue-50 rounded-lg">
+        <div class="flex items-center justify-center">
+          <div class="animate-spin w-5 h-5 border-2 border-[#123261] border-t-transparent rounded-full mr-2"></div>
+          <span class="text-[#123261] font-medium">Validando...</span>
+        </div>
+      </div>
+
+      <!-- Mensaje de éxito -->
+      <div *ngIf="empleadoExiste === true" class="mb-6 p-4 bg-green-50 rounded-lg">
+        <div class="flex items-center justify-center text-green-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <span class="font-medium">Usuario verificado, redirigiendo...</span>
+        </div>
+      </div>
+
+      <!-- Mensaje de error -->
+      <div *ngIf="empleadoExiste === false" class="mb-6 p-4 bg-red-50 rounded-lg">
+        <div class="flex items-center justify-center text-red-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+          <span class="font-medium">Usuario no registrado en el sistema</span>
+        </div>
+        <button (click)="resetearEstado()" class="mt-3 text-sm text-[#123261] hover:underline">
+          Intentar nuevamente
+        </button>
+      </div>
+
+      <!-- Input oculto para capturar el escaneo -->
+      <input
+        #escanerInput
+        type="text"
+        class="opacity-0 absolute"
+        [class.hidden]="estadoEscaneo !== 'escaneando'"
+        (focus)="selectAllText($event)"
+        (paste)="validarExistenciaUsuario($event)" />
+
+      <!-- Entrada manual (visible solo cuando está activada) -->
+      <div *ngIf="mostrarEntradaManual" class="mb-6">
+        <div class="flex items-center justify-center space-x-2">
+          <input
+            type="text"
+            [(ngModel)]="idManual"
+            class="border border-gray-300 rounded-lg px-4 py-2 w-48 focus:outline-none focus:ring-2 focus:ring-[#123261]"
+            placeholder="Número de nómina" />
+          <button
+            (click)="validarManualmente()"
+            class="bg-[#f2571a] text-white px-4 py-2 rounded-lg hover:bg-opacity-90 focus:outline-none">
+            Verificar
+          </button>
+        </div>
+        <button
+          (click)="toggleEntradaManual()"
+          class="mt-3 text-sm text-gray-600 hover:underline">
+          Volver al escaneo
+        </button>
+      </div>
+
+      <!-- Botones de acción principales -->
+      <div *ngIf="!mostrarEntradaManual && estadoEscaneo === 'inicial'" class="flex flex-col items-center">
+        <button
+          (click)="iniciarEscaneo()"
+          class="bg-[#f2571a] text-white px-6 py-3 rounded-full flex items-center justify-center hover:bg-opacity-90 focus:outline-none shadow-md w-64">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+          </svg>
+          ESCANEAR TARJETA
+        </button>
+
+        <button
+          (click)="toggleEntradaManual()"
+          class="mt-4 text-sm text-gray-600 hover:underline">
+          Ingresar ID manualmente
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-gray-50 py-4 px-6 text-center text-gray-500 text-sm border-t">
+      © 2025 Martinrea International Inc.
+    </div>
+  </div>
+</div>
